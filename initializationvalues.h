@@ -7,7 +7,7 @@ extern std::vector<double> rho;
 extern std::vector<double> p;
 extern std::vector<double> T;
 extern std::vector<double> h;
-extern double Q, q, Uct, k, Ffr, Cv, R, endTime, length, deltaT;
+extern double Q, q, Uct, k, Ffr, Cv, R, endTime, length, deltaT,relaxationFactor;
 class initializationValues
 {
 

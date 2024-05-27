@@ -7,7 +7,7 @@ std::vector<double> p(2,0.0);
 std::vector<double> T(2,0.0);
 std::vector<double> h(2,0.0);
 double Q = 0.0, q = 0.0, Uct = 0.0, k = 0.0, Ffr = 0.0, Cv = 0.0, R = 0.0, endTime =0.0;
-double length = 0.0, deltaT = 0.0;
+double length = 0.0, deltaT = 0.0, relaxationFactor = 0.0;
 initializationValues::initializationValues()
 {
 
@@ -37,8 +37,8 @@ void initializationValues::initialize() {
     Ffr = 0.0; //N
 
     deltaT = 0.01;
-    endTime =0.02;
+    endTime =0.1;
     A.push_back(A[0]);
-    length = 0.02;
-
+    length = 1.0;
+    relaxationFactor = 0.5;
 }

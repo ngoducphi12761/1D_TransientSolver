@@ -9,10 +9,14 @@ Compressible::Compressible(int initTime)
     TP0 = (T[0] + T[1])/2.0;
     Uct = (U[0] + U[1])/2.0;
 }
+Compressible::~Compressible(){
+
+}
 int Compressible::run()
 {
     std::cout << "========calculating======" <<std::endl;
     while (loop(deltaT)) {
+        std::cout << this->time << std::endl;
         // calculating Continuity equation
         calculateContinuity();
         // momentum equation
@@ -24,6 +28,7 @@ int Compressible::run()
         // logOutput
         logOutput();
     }
+
     //write file
     writeResultsToFile();
     std::cout << "========calculation end======" <<std::endl;
@@ -64,19 +69,30 @@ void Compressible::calculateEnergy() {
     TP = rhoP0 * Cv * TP0 * volume / deltaT - (rho[1] * Cv * T[1] * A[1] * U[1] - rho[0] * Cv * T[0] * A[0] * U[0])
             - pP0 * (U[1] * A[1] - U[0] * A[0]) + (k * A[1] * (T[1] - TP0) * 2 / length) - (k * A[0] * (TP0 - T[0]) * 2 / length)
             - Ffr * Uct;
-    TP /= (rhoP * Cv) * deltaT / volume;
+    TP /= (rhoP * Cv) * volume /deltaT;
 }
 
 void Compressible::updatePhysicalProperties() {
-    T[1] =(Q*length)/(2*k) + TP;
-    TP0 = (T[0] + T[1]) / 2.0;
+    double Tcal = 0.0, rhoCal = 0.0, UCal =0.0, pCal=0.0;
+    Tcal =(Q*length)/(2*k) + TP;
+    //  TP0 = (T[0] + T[1]) / 2.0;
+    TP0 = TP;
     pP = rhoP * R * TP0;
-    p[1] = 2 * pP - p[0];
-    rho[1] = p[1] / (R * T[1]);
-    U[1] = 2 * UP - U[0];
+    pCal = 2 * pP - p[0];
+
+    UCal = 2 * UP - U[0];
+
+    UP = (U[1] + U[0])/2.0*(1-relaxationFactor) + UP*relaxationFactor;
+
+    T[1] = T[1]*(1-relaxationFactor) + Tcal*relaxationFactor;
+    U[1] = U[1]*(1-relaxationFactor) + UCal*relaxationFactor;
+    p[1] = p[1]*(1-relaxationFactor) + UCal*relaxationFactor;
+
     h[1] = T[1] * (Cv + R) + U[1] * U[1] / 2.0;
+    rho[1] = p[1] / (R * T[1]);
+//    Uct = (U[0] + U[1])/2.0;
+    Uct = UP;
     CFL = Uct*deltaT/length;
-    Uct = (U[0] + U[1])/2.0;
 }
 void Compressible::logOutput() {
     CFL = Uct * deltaT / length;
@@ -87,7 +103,6 @@ void Compressible::logOutput() {
     ss <<"time: "<< this->time <<"; CFL = "<< CFL <<"; Temperature at inlet: "<< T[0] <<" K" << std::endl;
     ss <<"time: "<< this->time <<"; CFL = "<< CFL <<"; Temperature at outlet: "<< T[1] <<" K" << std::endl;
     ss <<"time: "<< this->time <<"; CFL = "<< CFL <<"; Total enthalpy at outlet: "<< h[1] <<" J/kg" << std::endl;
-    std::cout << ss.str() << std::endl;
 }
 void Compressible::writeResultsToFile() {
     std::string filePath = "C:\\Users\\DELL\\Documents\\applicationTask\\" + generateFilename();
@@ -100,4 +115,15 @@ void Compressible::writeResultsToFile() {
     } else {
         std::cerr << "Failed to open file for writing." << std::endl;
     }
+}
+void Compressible::updateUnderRelaxation(){
+    T[1] =(Q*length)/(2*k) + TP;
+    //  TP0 = (T[0] + T[1]) / 2.0;
+    TP0 = TP;
+    pP = rhoP * R * TP0;
+    p[1] = 2 * pP - p[0];
+    rho[1] = p[1] / (R * T[1]);
+    U[1] = 2 * UP - U[0];
+    h[1] = T[1] * (Cv + R) + U[1] * U[1] / 2.0;
+    CFL = Uct*deltaT/length;
 }

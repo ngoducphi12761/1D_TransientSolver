@@ -23,8 +23,10 @@ private:
    void logOutput();
    void writeResultsToFile();
    bool loop(double deltaT);
+   void updateUnderRelaxation();
 public:
     Compressible(int initTime);
+    ~Compressible();
     int run();
 };
 
