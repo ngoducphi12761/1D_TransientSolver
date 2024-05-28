@@ -5,9 +5,12 @@ Compressible::Compressible(int initTime)
     this->time = initTime;
 
     rhoP =0.0, rhoP0 =0.0, UP =0.0, UP0 = 0.0, CFL = 0.0;
-    volume = length*A[2],TP = 0.0, TP0 = 0.0,pP =0.0, pP0 =0.0, Uct =0.0;
-    TP0 = (T[0] + T[1])/2.0;
+    volume = length*A[2], TP0 =0.0, TP = 0.0,pP =0.0, pP0 =0.0, Uct =0.0;
+    TP0 = TPInit;
     Uct = (U[0] + U[1])/2.0;
+    rhoP0 = (rho[0]+rho[1])/2.0;
+    UP0 = (U[0]+U[1])/2.0;
+    pP0 = (p[0]+p[1])/2.0;
 }
 Compressible::~Compressible(){
 
@@ -16,7 +19,6 @@ int Compressible::run()
 {
     std::cout << "========calculating======" <<std::endl;
     while (loop(deltaT)) {
-        std::cout << this->time << std::endl;
         // calculating Continuity equation
         calculateContinuity();
         // momentum equation
@@ -48,12 +50,12 @@ std::string Compressible::generateFilename() {
     return "simulation_results_" + ss.str() + ".txt";
 }
 void Compressible::calculateContinuity() {
-    rhoP0 = (rho[0]+rho[1])/2.0;
+    //  rhoP0 = (rho[0]+rho[1])/2.0;
     // continuity equation
     rhoP = deltaT / volume * (rho[0] * U[0] * A[0] - rho[1] * U[1] * A[1]) + rhoP0;
 }
 void Compressible::calculateMomentum() {
-    UP0 = (U[0]+U[1])/2.0;
+
     UP = deltaT / volume * (-A[0] * (p[1] - p[0]) - Ffr - ((rho[1] * U[1] * U[1] * A[1]) - (rho[0] * U[0] * U[0] * A[0]))) + rhoP0 * UP0;
     UP /= rhoP;
     /*
@@ -63,36 +65,46 @@ void Compressible::calculateMomentum() {
 
 }
 void Compressible::calculateEnergy() {
-    pP0 = (p[0]+p[1])/2.0;
+
     //    Uct = UP;
 
     TP = rhoP0 * Cv * TP0 * volume / deltaT - (rho[1] * Cv * T[1] * A[1] * U[1] - rho[0] * Cv * T[0] * A[0] * U[0])
             - pP0 * (U[1] * A[1] - U[0] * A[0]) + (k * A[1] * (T[1] - TP0) * 2 / length) - (k * A[0] * (TP0 - T[0]) * 2 / length)
-            - Ffr * Uct;
+            + Ffr * Uct;
     TP /= (rhoP * Cv) * volume /deltaT;
 }
 
 void Compressible::updatePhysicalProperties() {
     double Tcal = 0.0, rhoCal = 0.0, UCal =0.0, pCal=0.0;
+    //   UP = (U[1] + U[0])/2.0*(1-relaxationFactor) + UP*relaxationFactor;
     Tcal =(Q*length)/(2*k) + TP;
+    Tcal = Tcal + fixedGradientTemperatureValue*2/length;
     //  TP0 = (T[0] + T[1]) / 2.0;
-    TP0 = TP;
-    pP = rhoP * R * TP0;
-    pCal = 2 * pP - p[0];
+    //  TP0 = TP;
+    pP = rhoP * R * TP;
 
-    UCal = 2 * UP - U[0];
-
-    UP = (U[1] + U[0])/2.0*(1-relaxationFactor) + UP*relaxationFactor;
-
+    //  pP = rhoP * R * TP;
+    //  pCal = 2 * pP - p[0];
+    pCal = pP + fixedGradientPressureValue*2/length;
+    //    UCal = 2 * UP - U[0];
+    UCal =  UP + fixedGradientVelocityValue*2/length;;
+    //   TP0  = TP0*(1-relaxationFactor) + TP*relaxationFactor;
     T[1] = T[1]*(1-relaxationFactor) + Tcal*relaxationFactor;
     U[1] = U[1]*(1-relaxationFactor) + UCal*relaxationFactor;
-    p[1] = p[1]*(1-relaxationFactor) + UCal*relaxationFactor;
-
+    p[1] = p[1]*(1-relaxationFactor) + pCal*relaxationFactor;
+    rho[1] = rho[1]*(1-relaxationFactor) + rhoP*relaxationFactor;
     h[1] = T[1] * (Cv + R) + U[1] * U[1] / 2.0;
-    rho[1] = p[1] / (R * T[1]);
-//    Uct = (U[0] + U[1])/2.0;
+ //   rho[1] = p[1] / (R * T[1]);
+    rhoP0 = rhoP;
+    //    Uct = (U[0] + U[1])/2.0;
+    //   Uct = (U[1]+U[0])/2.0;
     Uct = UP;
+    UP0 = UP;
+    pP0 =pP;
+    //   TP = (T[0] + T[1])/2.0;
+    TP0 = TP;
     CFL = Uct*deltaT/length;
+
 }
 void Compressible::logOutput() {
     CFL = Uct * deltaT / length;

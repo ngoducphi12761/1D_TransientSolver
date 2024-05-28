@@ -13,7 +13,7 @@ class Compressible
 private:
    double time;
    double rhoP , rhoP0 , UP , UP0 , CFL;
-   double volume ,TP , TP0 ,pP , pP0, Uct ;
+   double volume , TP0 ,pP , pP0, Uct, TP ;
    std::stringstream ss;
    std::string generateFilename();
    void calculateMomentum();
