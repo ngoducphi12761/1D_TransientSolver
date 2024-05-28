@@ -98,11 +98,11 @@ void Compressible::updatePhysicalProperties() {
     rhoP0 = rhoP;
     //    Uct = (U[0] + U[1])/2.0;
     //   Uct = (U[1]+U[0])/2.0;
-    Uct = UP;
-    UP0 = UP;
-    pP0 =pP;
+    Uct = (U[1] +U[0])/2.0;
+    UP0 = U[1];
+    pP0 =p[1];
     //   TP = (T[0] + T[1])/2.0;
-    TP0 = TP;
+    TP0 = T[1];
     CFL = Uct*deltaT/length;
 
 }
