@@ -19,36 +19,38 @@ void initializationValues::initialize() {
     Cv = 717.4; //J/(kg.K)
     R = 8.314/29*1000; //= 287 J/mol.K -> J/kg.K
     h[0] = 301426.8966; // J/kg
+    // Velocity
     U[0] = 20.0; // m/s
-
     U[1] =U[0];
- //   T[1] = T[0];
-
-    // for steel
+    // Cross section
     A[0]= 25.0 ;// m^2
     A[1]= 25.0 ;// m^2
- //   p[0] = rho[0]*R*T[0]; //Pa
-
-
+    A.push_back(A[0]);
+    // Thermal conductivity
     k = 50.0; // W/mK
- //   Q = 5000.0; // W/m^2
+    // Heat Flow
      Q = 50.0; // W/m^2
-//   Ffr = 100.0; //N
+    // Frictional force
     Ffr = 0.0; //N
-
+    // Initialize calculated time
     deltaT = 0.01;
     endTime =0.1;
-    A.push_back(A[0]);
+    // length of a unit control volume
     length = 1.0;
+    // under relxation factor
     relaxationFactor = 1.0;
-    fixedGradientPressureValue = 0.0;
-    fixedGradientTemperatureValue =0.0;
-    fixedGradientVelocityValue = 0.0000;
+    //fixedGradient for outlet boundary condition
+    fixedGradientPressureValue = .0;
+    fixedGradientTemperatureValue =0.15;
+    fixedGradientVelocityValue = 0.1;
+    // initialize Temperature for inlet and outlet at time = 0;
     T[0] = (h[0] -U[0]*U[0]/2)/(Cv+R);
     TPInit =(Q*length)/(2*k) + T[0];
     T[1]=(Q*length)/(2*k) + TPInit;
+    // initialize Pressure for inlet and outlet at time = 0;
     p[0] = 105550.7; //Pa
     p[1] = p[0]; //Pa
+    // initialize Density for inlet and outlet at time = 0;
     rho[0] = p[0]/(R*T[0]);
     rho[1] = p[1]/(R*T[1]);
 

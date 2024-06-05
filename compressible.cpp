@@ -17,7 +17,6 @@ Compressible::~Compressible(){
 }
 int Compressible::run()
 {
-    std::cout << "========calculating======" <<std::endl;
     while (loop(deltaT)) {
         // calculating Continuity equation
         calculateContinuity();
@@ -50,24 +49,14 @@ std::string Compressible::generateFilename() {
     return "simulation_results_" + ss.str() + ".txt";
 }
 void Compressible::calculateContinuity() {
-    //  rhoP0 = (rho[0]+rho[1])/2.0;
-    // continuity equation
     rhoP = deltaT / volume * (rho[0] * U[0] * A[0] - rho[1] * U[1] * A[1]) + rhoP0;
 }
 void Compressible::calculateMomentum() {
 
     UP = deltaT / volume * (-A[0] * (p[1] - p[0]) - Ffr - ((rho[1] * U[1] * U[1] * A[1]) - (rho[0] * U[0] * U[0] * A[0]))) + rhoP0 * UP0;
     UP /= rhoP;
-    /*
-        UP = deltaT/volume*((-A[0]*(p[1]-p[0])-Ffr-((rho[1]*U[1]*U[1]*A[1])-(rho[0]*U[0]*U[0]*A[0]))))
-                + rhoP0*UP0;
-        UP = UP/rhoP;*/
-
 }
 void Compressible::calculateEnergy() {
-
-    //    Uct = UP;
-
     TP = rhoP0 * Cv * TP0 * volume / deltaT - (rho[1] * Cv * T[1] * A[1] * U[1] - rho[0] * Cv * T[0] * A[0] * U[0])
             - pP0 * (U[1] * A[1] - U[0] * A[0]) + (k * A[1] * (T[1] - TP0) * 2 / length) - (k * A[0] * (TP0 - T[0]) * 2 / length)
             + Ffr * Uct;
