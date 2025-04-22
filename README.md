@@ -16,13 +16,14 @@
 The simulation is governed by the following:
 
 - **Continuity Equation:**  
-  $$ \frac{{\partial \rho}}{{\partial t}} + \frac{{\partial (\rho u)}}{{\partial x}} = 0 $$
+  ∂ρ/∂t + ∂(ρu)/∂x = 0
 
 - **Momentum Equation:**  
-  $$ \frac{{\partial (\rho u)}}{{\partial t}} + \frac{{\partial (\rho u^2)}}{{\partial x}} = -\frac{{\partial p}}{{\partial x}} + \dot{F}_{fr} $$
+  ∂(ρu)/∂t + ∂(ρu²)/∂x = -∂p/∂x + Ḟ_fr
 
 - **Energy Equation (Ideal Gas):**  
-  $$ \frac{{\partial (\rho C_v T)}}{{\partial t}} + \frac{{\partial (\rho C_v T u)}}{{\partial x}} = -p \frac{{\partial u}}{{\partial x}} + \frac{{\partial}}{{\partial x}}\left(k \frac{{\partial T}}{{\partial x}}\right) + \dot{F}_{fr} u $$
+  ∂(ρCvT)/∂t + ∂(ρCvTu)/∂x = -p ∂u/∂x + ∂/∂x(k ∂T/∂x) + Ḟ_fr u
+
 
 ## 📥 Input Parameters
 
